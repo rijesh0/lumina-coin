@@ -37,15 +37,14 @@ bot.start((ctx) => {
             db.query('INSERT INTO users (telegram_id) VALUES (?)', [telegramId], (err) => {
                 if (err) {
                     console.error('Database error:', err);
-                    ctx.reply('An error occurred during registration.');
+                    ctx.reply('An error occurred during registration. Please Click On Play to Start the game');
                     return;
                 }
                 ctx.reply('Welcome! You have been registered.');
                 
             });
         } else {
-            ctx.reply('Welcome back! You are already registered.');
-            ctx.reply('hi');
+            ctx.reply('Welcome back! You are already registered. Please Click On Play to Start the game');
         }
     });
 });

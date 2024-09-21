@@ -1,89 +1,96 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize user's LUMINA balance (starting at 0)
-  let luminaBalance = 0;
+const { Telegraf } = require('telegraf');
+const mysql = require('mysql2');
+const { text } = require('body-parser');
 
-  // Function to update the LUMINA count in the UI
-  function updateLuminaCount() {
-    document.getElementById('lumina-count').innerText = luminaBalance;
-  }
+const bot = new Telegraf('7267953844:AAGV5MvXrbyhMr3vFz_PKTVBtF2z4ZvD5-k'); // Replace with your bot token
 
-  // Handle the 'Join' button clicks for tasks
-  const joinButtons = document.querySelectorAll('.task-button');
-  joinButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      // Open the external link in a new tab
-      const url = this.getAttribute('data-url');
-      window.open(url, '_blank');
-
-      // Add 100 LUMINA reward for completing the task
-      luminaBalance += 100;
-      updateLuminaCount();
-    });
-  });
-
-  // Coin flip logic
-  const flipCoinButton = document.getElementById('flip-coin-btn');
-  const coinFlipResult = document.getElementById('coin-flip-result');
-
-  flipCoinButton.addEventListener('click', function() {
-    // Get the amount the user wants to bet
-    const betAmount = parseInt(document.getElementById('lumina-bet').value);
-    
-    // Check if the bet is valid (must be a number and less than or equal to the balance)
-    if (isNaN(betAmount) || betAmount <= 0) {
-      coinFlipResult.innerText = "Please enter a valid bet.";
-      return;
-    }
-
-    if (betAmount > luminaBalance) {
-      coinFlipResult.innerText = "You don't have enough LUMINA to place that bet.";
-      return;
-    }
-
-    // Simulate the coin flip (50/50 chance)
-    const coinFlip = Math.random() < 0.5 ? 'heads' : 'tails';
-    
-    // Randomly choose heads or tails for the outcome
-    if (coinFlip === 'heads') {
-      // User wins, double the bet amount
-      luminaBalance += betAmount;
-      coinFlipResult.innerText = `You won! Your bet of ${betAmount} LUMINA was doubled.`;
-    } else {
-      // User loses, subtract the bet amount
-      luminaBalance -= betAmount;
-      coinFlipResult.innerText = `You lost! You lost ${betAmount} LUMINA.`;
-    }
-
-    // Update the LUMINA count display
-    updateLuminaCount();
-  });
-
-  // Initialize the LUMINA count display
-  updateLuminaCount();
+// MySQL Connection Setup
+const db = mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'root', // your MySQL username
+    password: 'CLB2728A80', // your MySQL password
+    database: 'telegram_game'
 });
 
-// coin flip info 
+db.connect(err => {
+    if (err) {
+        console.error('Error connecting to MySQL:', err);
+        return;
+    }
+    console.log('Connected to MySQL database.');
+});
 
- // Get the modal element
- var modal = document.getElementById("gameModal");
+// Start Command
+bot.start((ctx) => {
+    const telegramId = ctx.message.from.id;
 
- // Get the info icon and close button
- var infoIcon = document.getElementById("info-icon");
- var closeBtn = document.getElementsByClassName("close")[0];
+    // Check if user exists
+    db.query('SELECT * FROM users WHERE telegram_id = ?', [telegramId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            ctx.reply('An error occurred. Please try again.');
+            return;
+        }
 
- // Open the modal when the info icon is clicked
- infoIcon.onclick = function () {
-   modal.style.display = "block";
- };
+        if (results.length === 0) {
+            // New user, insert into DB
+            db.query('INSERT INTO users (telegram_id) VALUES (?)', [telegramId], (err) => {
+                if (err) {
+                    console.error('Database error:', err);
+                    ctx.reply('An error occurred during registration.');
+                    return;
+                }
+                ctx.reply('Welcome! You have been registered.');
+                ctx.reply("Welcome To Lumina Coin! Click on play to start the game",{
+                    reply_markup:{
+                        inline_keyboard:[
+                            {
+                                text:"Play",
+                                callback_data: "http://t.me/Lumina0_Bot/myapp"
+                            }
+                        ]
+                    }
+                })
+                
+            });
+        } else {
+            ctx.reply('Welcome back! You are already registered.');
+        }
+    });
+});
+// Command to check balance
+bot.command('balance', (ctx) => {
+    const telegramId = ctx.message.from.id;
 
- // Close the modal when the close button is clicked
- closeBtn.onclick = function () {
-   modal.style.display = "none";
- };
+    db.query('SELECT balance FROM users WHERE telegram_id = ?', [telegramId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            ctx.reply('An error occurred. Please try again.');
+            return;
+        }
 
- // Close the modal when clicking outside of the modal content
- window.onclick = function (event) {
-   if (event.target == modal) {
-     modal.style.display = "none";
-   }
- };
+        if (results.length > 0) {
+            const balance = results[0].balance;
+            ctx.reply(`Your balance is: ${balance} coins.`);
+        } else {
+            ctx.reply('You are not registered yet. Use /start to register.');
+            ctx.reply("Click On Play Button To Start the bot")
+        }
+    });
+});
+
+// Command to update balance (for simplicity, we're adding 10 coins)
+bot.command('earn', (ctx) => {
+    const telegramId = ctx.message.from.id;
+
+    db.query('UPDATE users SET balance = balance + 10 WHERE telegram_id = ?', [telegramId], (err) => {
+        if (err) {
+            console.error('Database error:', err);
+            ctx.reply('An error occurred while updating balance.');
+            return;
+        }
+        ctx.reply('You earned 10 coins!');
+    });
+});
+
+bot.launch();

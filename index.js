@@ -6,9 +6,9 @@ const bot = new Telegraf('7267953844:AAGV5MvXrbyhMr3vFz_PKTVBtF2z4ZvD5-k'); // R
 
 // MySQL Connection Setup
 const db = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root', // your MySQL username
-    password: 'CLB2728A80', // your MySQL password
+    host: 'mysql-38ee13b7-rijeshsapkota023-b3be.i.aivencloud.com',
+    user: 'avnadmin', // your MySQL username
+    password: 'AVNS_q8WCH_9XsyJus7vT1Ur', // your MySQL password
     database: 'telegram_game'
 });
 

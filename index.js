@@ -46,25 +46,7 @@ bot.start((ctx) => {
         } else {
             ctx.reply('Welcome back! You are already registered.');
         }
-        let course = new WizardScene("Click On Play To Start The Game",
-            async(ctx)=>{
-                ctx.reply(`Hey There! Choose your preferred domain`,
-                {
-                    reply_markup:{
-                        inline_keyboard:[
-                            [
-                                {
-                                    text:"Frontend",
-                                    callback_data:"Frontend"
-                                },
-                                {
-                                    text:"Backend",
-                                    callback_data:"Backend"
-                                }
-                            ]
-                        ]
-                    }
-                })
+        ctx.reply('Hi!!');
     });
 });
 // Command to check balance

@@ -45,11 +45,9 @@ bot.start((ctx) => {
             });
         } else {
             ctx.reply('Welcome back! You are already registered.');
+            ctx.reply('hi');
         }
     });
-    
-         tx.reply('Hi!!');
-
 });
 // Command to check balance
 bot.command('balance', (ctx) => {

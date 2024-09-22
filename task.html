@@ -18,35 +18,35 @@
       <!-- Task Section -->
       <div class="task-section custom-scrollbar">
         <!-- Task 1 -->
-        <div class="task-div">
+        <div class="task-div" id="task-1">
           <div class="task-title">Subscribe to our channel</div>
-          <div class="task-button"  data-url="https://www.youtube.com/@LuminaOffical">Do</div>
+          <div class="task-button"  data-url="https://www.youtube.com/@LuminaOffical" data-task-id="1">Do</div>
         </div>
 
         <!-- Task 2 -->
-        <div class="task-div">
+        <div class="task-div" id="task-2">
           <div class="task-title">Join Telegram channel</div>
-          <div class="task-button"  data-url="https://t.me/luminaoffical">Do</div>
+          <div class="task-button"  data-url="https://t.me/luminaoffical" data-task-id="2">Do</div>
         </div>
 
         <!-- Task 3 -->
-        <div class="task-div">
+        <div class="task-div" id="task-3">
           <div class="task-title">Play Memefi</div>
-          <div class="task-button" data-url="https://t.me/memefi_coin_bot/main?startapp=r_1b2f11c14a">Do</div>
+          <div class="task-button" data-url="https://t.me/memefi_coin_bot/main?startapp=r_1b2f11c14a" data-task-id="3">Do</div>
         </div>
 
         <!-- Task 4 -->
-        <div class="task-div">
+        <div class="task-div" id="task-4">
           <div class="task-title">Play Tomarket</div>
-          <div class="task-button" data-url="https://t.me/Tomarket_ai_bot/app?startapp=0000pphrFarm">Do</div>
+          <div class="task-button" data-url="https://t.me/Tomarket_ai_bot/app?startapp=0000pphrFarm" data-task-id="4">Do</div>
         </div>
 
-        <div class="task-div">
+        <!-- Task 5 -->
+        <div class="task-div" id="task-5">
           <div class="task-title">Play Tomarket</div>
-          <div class="task-button" data-url="https://t.me/Tomarket_ai_bot/app?startapp=0000pphrFarm">Do</div>
+          <div class="task-button" data-url="https://t.me/Tomarket_ai_bot/app?startapp=0000pphrFarm" data-task-id="5">Do</div>
         </div>
       </div>
-    </div>
 
     <!-- Footer -->
     <div class="fixed bottom-0 left-0 right-0 bg-black p-4 flex justify-around border-t border-gray-700">
@@ -63,6 +63,39 @@
         <span class="text-sm">Frens</span>
       </a>
     </div>
+
+    <script>
+      document.querySelectorAll('.task-button').forEach(button => {
+        button.addEventListener('click', () => {
+          const url = button.getAttribute('data-url');
+          const taskId = button.getAttribute('data-task-id');
+          
+          // Redirect the user to the URL
+          window.open(url, '_blank');
+
+          // Set a 10-second delay to remove the task
+          setTimeout(() => {
+            const taskDiv = document.getElementById(`task-${taskId}`);
+            taskDiv.remove();
+
+            // Send task completion data to the server
+            fetch('/complete-task', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                taskId: taskId,
+                status: 'completed',
+                timestamp: new Date().toISOString(),
+              }),
+            })
+            .then(response => response.json())
+            .then(data => console.log('Task completion saved:', data))
+            .catch((error) => console.error('Error:', error));
+          }, 10000);  // 10 seconds
+        });
+      });
+    </script>
   </body>
-  <script src="script.js"></script>
 </html>

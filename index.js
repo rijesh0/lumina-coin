@@ -2,7 +2,7 @@ const { Telegraf } = require('telegraf');
 const mysql = require('mysql2');
 const { text } = require('body-parser');
 
-const bot = new Telegraf('7267953844:AAEI7MgdBL4g_K3vUnRxk1Fma-cRimFYgwE'); // Replace with your bot token
+const bot = new Telegraf('7267953844:AAFvJAtBwdINBS0bbMuRtg1-hs6hL1VF0CQ'); // Replace with your bot token
 
 // MySQL Connection Setup
 const db = mysql.createConnection({
